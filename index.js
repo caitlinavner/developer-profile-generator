@@ -2,8 +2,8 @@ const axios = require("axios");
 const inquirer = require("inquirer");
 const fs = require("fs");
 const util = require("util");
-const htmlToPdf = require("electron-html-to");
-const electron = require("electron");
+//const htmlToPdf = require("electron-html-to");
+//const electron = require("electron");
 const writeFileAsync = util.promisify(fs.writeFile);
 const readFileAsync = util.promisify(fs.readFile);
 const colors = {
@@ -47,7 +47,57 @@ promptUser = () => {
     }
   ]);
 };
-function generateHTML(answers) {
+promptUser().then(function ({ username, colors }) {
+  const queryUrl = `https://api.github.com/users/${username}`;
+  axios.get(queryUrl).then(function (res) {
+    const name = name;
+    const picture = picture_url;
+    const githubUser = login;
+    const location = location;
+    const githubLink = html_url;
+    const blogLink = blog;
+    const bio = bio;
+    const repos = public_repos;
+    const followers = followers;
+    const following = following;
+    const queryUrlStars = `https://api.github.com/users/${username}/starred`;
+    axios
+      .get(queryUrlStars)
+      .then(function (stars) {
+        const starsLength = stars.data.length;
+        const githubUserData = {
+          name,
+          picture,
+          githubUser,
+          location,
+          githubLink,
+          blogLink,
+          bio,
+          repos,
+          followers,
+          following,
+          starsLength
+        };
+        const html = generateHTML(githubUserData, colors);
+        writeFileAsync("index.html", html);
+      })
+      .then(() => {
+        readFileAsync("index.html", "utf8").then(htmlString => {
+          const conversion = htmlToPdf({
+            converterPath: htmlToPdf.converters.PDF
+          });
+          conversion({ html: htmlString }, function (err, result) {
+            if (err) {
+              return console.error(err);
+            }
+            result.stream.pipe(fs.createWriteStream("Profile.pdf"));
+            conversion.kill();
+          });
+        });
+      });
+  });
+});
+function generateHTML(githubUserData, selectedColor) {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +127,7 @@ function generateHTML(answers) {
          height: 100%;
          }
          .wrapper {
-         background-color: ${colors[answers.color].wrapperBackground};
+         background-color: ${colors[selectedColor].wrapperBackground};
          padding-top: 100px;
          }
          body {
@@ -119,8 +169,8 @@ function generateHTML(answers) {
          display: flex;
          justify-content: center;
          flex-wrap: wrap;
-         background-color: ${colors[answers.color].headerBackground};
-         color: ${colors[answers.color].headerColor};
+         background-color: ${colors[SelectedColor].headerBackground};
+         color: ${colors[SelectedColor].headerColor};
          padding: 10px;
          width: 95%;
          border-radius: 6px;
@@ -131,7 +181,7 @@ function generateHTML(answers) {
          border-radius: 50%;
          object-fit: cover;
          margin-top: -75px;
-         border: 6px solid ${colors[answers.color].photoBorderColor};
+         border: 6px solid ${colors[SelectedColor].photoBorderColor};
          box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
          }
          .photo-header h1, .photo-header h2 {
@@ -174,8 +224,8 @@ function generateHTML(answers) {
          .card {
            padding: 20px;
            border-radius: 6px;
-           background-color: ${colors[answers.color].headerBackground};
-           color: ${colors[answers.color].headerColor};
+           background-color: ${colors[SelectedColor].headerBackground};
+           color: ${colors[SelectedColor].headerColor};
            margin: 20px;
          }
          
@@ -210,7 +260,7 @@ function generateHTML(answers) {
 </body>
 </html>`;
 }
-promptUser()
+/*promptUser()
   .then(function({ username }) {
     const queryUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
   })
@@ -223,4 +273,4 @@ promptUser()
   })
   .catch(function(err) {
     console.log(err);
-  });
+  }); */
