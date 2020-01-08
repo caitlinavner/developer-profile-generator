@@ -180,8 +180,8 @@ function generateHTML(data) {
         <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
         <ul class="list-group">
           <li class="list-group-item">My GitHub username is ${
-            answers.github
-          }</li>
+    answers.github
+    }</li>
         </ul>
         <img src="${answers.image}"/>
       </div>

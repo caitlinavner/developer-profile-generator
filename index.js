@@ -1,11 +1,11 @@
-const axios = require("axios");
 const inquirer = require("inquirer");
 const fs = require("fs");
+//const electron = require('electron');
+//const convertFactory = require('electron-html-to');
 const util = require("util");
-//const htmlToPdf = require("electron-html-to");
-//const electron = require("electron");
 const writeFileAsync = util.promisify(fs.writeFile);
 const readFileAsync = util.promisify(fs.readFile);
+const axios = require("axios");
 const colors = {
   green: {
     wrapperBackground: "#E6E1C3",
@@ -32,7 +32,7 @@ const colors = {
     photoBorderColor: "white"
   }
 };
-promptUser = () => {
+function promptUser () {
   return inquirer.prompt([
     {
       type: "input",
@@ -50,16 +50,17 @@ promptUser = () => {
 promptUser().then(function ({ username, colors }) {
   const queryUrl = `https://api.github.com/users/${username}`;
   axios.get(queryUrl).then(function (res) {
-    const name = name;
-    const picture = picture_url;
-    const githubUser = login;
-    const location = location;
-    const githubLink = html_url;
-    const blogLink = blog;
-    const bio = bio;
-    const repos = public_repos;
-    const followers = followers;
-    const following = following;
+    const a = res.data;
+    const name = a.name;
+    const picture = a.picture_url;
+    const githubUser = a.login;
+    const location = a.location;
+    const githubLink = a.html_url;
+    const blogLink = a.blog;
+    const bio = a.bio;
+    const repos = a.public_repos;
+    const followers = a.followers;
+    const following = a.following;
     const queryUrlStars = `https://api.github.com/users/${username}/starred`;
     axios
       .get(queryUrlStars)
@@ -78,12 +79,12 @@ promptUser().then(function ({ username, colors }) {
           following,
           starsLength
         };
-        const html = generateHTML(githubUserData, colors);
-        writeFileAsync("index.html", html);
+       // const html = generateHTML(githubUserData, colors);
+        //writeFileAsync("index.html");
       })
       .then(() => {
         readFileAsync("index.html", "utf8").then(htmlString => {
-          const conversion = htmlToPdf({
+          const convertFactory = htmlToPdf({
             converterPath: htmlToPdf.converters.PDF
           });
           conversion({ html: htmlString }, function (err, result) {
@@ -127,7 +128,8 @@ function generateHTML(githubUserData, selectedColor) {
          height: 100%;
          }
          .wrapper {
-         background-color: ${colors[selectedColor].wrapperBackground};
+         background-color: ${colors(SelectedColors.color).wrapperBackground};
+         color: ${colors[SelectedColor].wrapperColor};
          padding-top: 100px;
          }
          body {
@@ -169,7 +171,7 @@ function generateHTML(githubUserData, selectedColor) {
          display: flex;
          justify-content: center;
          flex-wrap: wrap;
-         background-color: ${colors[SelectedColor].headerBackground};
+         background-color: ${colors[SelectedColor.colors].headerBackground};
          color: ${colors[SelectedColor].headerColor};
          padding: 10px;
          width: 95%;
@@ -181,7 +183,8 @@ function generateHTML(githubUserData, selectedColor) {
          border-radius: 50%;
          object-fit: cover;
          margin-top: -75px;
-         border: 6px solid ${colors[SelectedColor].photoBorderColor};
+         border: 6px solid ${colors[SelectedColor.colors].photoBorderColor};
+         color: ${colors[SelectedColor].photoBorderColor};
          box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
          }
          .photo-header h1, .photo-header h2 {
@@ -246,7 +249,59 @@ function generateHTML(githubUserData, selectedColor) {
           } 
          }
       </style>
-<body>
+       <body>
+       <div class="wrapper">
+      <div class="photo-header">
+        <img class="" src="${githubUserData.picture}" />
+        <h1>Hi!</h1>
+        <h1>My name is ${githubUserData.name}</h1>
+        <div class="links-nav">
+          <a
+            class="nav-link"
+            href="https://www.google.com/maps/place/${githubUserData.location}"
+            ><i class="fas fa-map-marker-alt">${githubUserData.location}</i>
+          </a>
+          <a class="nav-link" href="${githubUserData.githubLink}"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+          <a class="nav-link" href="${githubUserData.blogLink}"
+            ><i class="fas fa-rss"></i> Blog</a
+          >
+        </div>
+      </div>
+      <main>
+        <div class="container">
+          <h1 class="col">${githubUserData.bio}</h1>
+          <div class="card-deck">
+            <div class="card col col-sm-6">
+              <h2>Followers</h2>
+              <h3>${githubUserData.followers}</h3>
+            </div>
+            <div class="card col col-sm-6">
+              <h2>Following</h2>
+              <h3>${githubUserData.following}</h3>
+            </div>
+          </div>
+          <br />
+          <div class="card-deck">
+            <div class="card col col-sm-6">
+              <h2>GitHub stars</h2>
+              <h3>${githubUserData.starsLength}</h3>
+            </div>
+            <div class="card col col-sm-6">
+              <h2>Public Repos</h2>
+              <h3>${githubUserData.repos}</h3>
+            </div>
+          </div>
+          <br />
+        </div>
+      </main>
+    </div>
+       </body>
+      </html>
+`;
+}
+/*<body>
   <div class="jumbotron jumbotron-fluid">
   <div class="container wrapper">
     <h1 class="display-4">Hi! My name is ${answers.name}</h1>
@@ -260,7 +315,8 @@ function generateHTML(githubUserData, selectedColor) {
 </body>
 </html>`;
 }
-/*promptUser()
+
+promptUser()
   .then(function({ username }) {
     const queryUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
   })
