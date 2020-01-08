@@ -1,32 +1,17 @@
+const axios = require("axios");
 const inquirer = require("inquirer");
 const fs = require("fs");
 const util = require("util");
+const htmlToPdf = require("electron-html-to");
+const electron = require("electron");
 const writeFileAsync = util.promisify(fs.writeFile);
-function promptUser() {
-  return inquirer.prompt([
-    {
-      type: "input",
-      name: "name",
-      message: "What is your name?"
-    },
-    {
-      type: "input",
-      name: "color",
-      message: "What's your favorite color?"
-    },
-    {
-      type: "input",
-      name: "github",
-      message: "Enter your GitHub Username"
-    },
-  ]);
-}
+const readFileAsync = util.promisify(fs.readFile);
 const colors = {
   green: {
     wrapperBackground: "#E6E1C3",
     headerBackground: "#C1C72C",
-    headerColor: "green",
-    photoBorderColor: "#green"
+    headerColor: "white",
+    photoBorderColor: "#black"
   },
   blue: {
     wrapperBackground: "#5F64D3",
@@ -41,11 +26,26 @@ const colors = {
     photoBorderColor: "#FEE24C"
   },
   red: {
-    wrapperBackground: "#DE9967",
+    wrapperBackground: "#bd2318",
     headerBackground: "#870603",
     headerColor: "white",
     photoBorderColor: "white"
   }
+};
+promptUser = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "username",
+      message: "What's your GitHub username?"
+    },
+    {
+      type: "list",
+      name: "colors",
+      message: "Which color do you prefer?",
+      choices: ["green", "blue", "pink", "red"]
+    }
+  ]);
 };
 function generateHTML(answers) {
   return `
@@ -57,6 +57,7 @@ function generateHTML(answers) {
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
       <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"/>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
       <link href="https://fonts.googleapis.com/css?family=BioRhyme|Cabin&display=swap" rel="stylesheet">
       <title>Document</title>
       <style>
@@ -202,7 +203,7 @@ function generateHTML(answers) {
     <p class="lead">My favorite color is ${answers.color}.</p>
     <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
     <ul class="list-group">
-      <li class="list-group-item">My GitHub username is ${answers.github}</li>
+      <li class="list-group-item">My GitHub username is ${answers.username}</li>
     </ul>
   </div>
 </div>
@@ -210,6 +211,9 @@ function generateHTML(answers) {
 </html>`;
 }
 promptUser()
+  .then(function({ username }) {
+    const queryUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
+  })
   .then(function(answers) {
     const html = generateHTML(answers);
     return writeFileAsync("index.html", html);
