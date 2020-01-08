@@ -171,17 +171,16 @@ function generateHTML(data) {
           } 
          }
       </style>
-  
-    < body >
+
+module.exports = generateHTML;
+   < body >
     <div class="jumbotron jumbotron-fluid">
       <div class="container">
         <h1 class="display-4">Hi! My name is ${answers.name}</h1>
         <p class="lead">My favorite color is ${answers.color}.</p>
         <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
         <ul class="list-group">
-          <li class="list-group-item">My GitHub username is ${
-    answers.github
-    }</li>
+          <li class="list-group-item">My GitHub username is ${answers.github}</li>
         </ul>
         <img src="${answers.image}"/>
       </div>

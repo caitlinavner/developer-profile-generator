@@ -48,6 +48,8 @@ function promptUser () {
   ]);
 };
 promptUser().then(function ({ username, colors }) {
+  const selectedColor = colors;
+  //console.log(selectedColor.color);
   const queryUrl = `https://api.github.com/users/${username}`;
   axios.get(queryUrl).then(function (res) {
     const a = res.data;
@@ -79,25 +81,26 @@ promptUser().then(function ({ username, colors }) {
           following,
           starsLength
         };
-       // const html = generateHTML(githubUserData, colors);
+        console.log(selectedColor)
+        generateHTML(githubUserData, selectedColor);
         //writeFileAsync("index.html");
       })
       .then(() => {
         readFileAsync("index.html", "utf8").then(htmlString => {
-          const convertFactory = htmlToPdf({
-            converterPath: htmlToPdf.converters.PDF
-          });
-          conversion({ html: htmlString }, function (err, result) {
-            if (err) {
-              return console.error(err);
-            }
-            result.stream.pipe(fs.createWriteStream("Profile.pdf"));
-            conversion.kill();
-          });
+          //const convertFactory = htmlToPdf({
+           // converterPath: htmlToPdf.converters.PDF
+          //});
+          //conversion({ html: htmlString }, function (err, result) {
+          //  if (err) {
+           //   return console.error(err);
+           // }
+           // res.stream.pipe(fs.createWriteStream("Profile.pdf"));
+           // conversion.kill();
+         });
         });
       });
   });
-});
+//});
 function generateHTML(githubUserData, selectedColor) {
   return `
 <!DOCTYPE html>
@@ -128,8 +131,8 @@ function generateHTML(githubUserData, selectedColor) {
          height: 100%;
          }
          .wrapper {
-         background-color: ${colors(SelectedColors.color).wrapperBackground};
-         color: ${colors[SelectedColor].wrapperColor};
+         background-color: ${colors[selectedColor.wrapperBackground]};
+         color: ${colors[selectedColor.wrapperColor]};
          padding-top: 100px;
          }
          body {
@@ -171,8 +174,8 @@ function generateHTML(githubUserData, selectedColor) {
          display: flex;
          justify-content: center;
          flex-wrap: wrap;
-         background-color: ${colors[SelectedColor.colors].headerBackground};
-         color: ${colors[SelectedColor].headerColor};
+         background-color: ${colors[selectedColor.headerBackground]};
+         color: ${colors[selectedColor.headerColor]};
          padding: 10px;
          width: 95%;
          border-radius: 6px;
@@ -183,8 +186,8 @@ function generateHTML(githubUserData, selectedColor) {
          border-radius: 50%;
          object-fit: cover;
          margin-top: -75px;
-         border: 6px solid ${colors[SelectedColor.colors].photoBorderColor};
-         color: ${colors[SelectedColor].photoBorderColor};
+         border: 6px solid ${colors[selectedColor.photoBorderColor]};
+         color: ${colors[selectedColor.photoBorderColor]};
          box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
          }
          .photo-header h1, .photo-header h2 {
@@ -227,8 +230,8 @@ function generateHTML(githubUserData, selectedColor) {
          .card {
            padding: 20px;
            border-radius: 6px;
-           background-color: ${colors[SelectedColor].headerBackground};
-           color: ${colors[SelectedColor].headerColor};
+           background-color: ${colors[selectedColor.headerBackground]};
+           color: ${colors[selectedColor.headerColor]};
            margin: 20px;
          }
          
