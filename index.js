@@ -105,6 +105,7 @@ promptUser().then(function({ username, colors }) {
 });
 
 function generateHTML(githubUserData, selectedColor) {
+  console.log(selectedColor);
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -134,8 +135,8 @@ function generateHTML(githubUserData, selectedColor) {
          height: 100%;
          }
          .wrapper {
-         background-color: ${colors[selectedColor.wrapperBackground]};
-         color: ${colors[selectedColor.wrapperColor]};
+         background-color: ${colors[selectedColor].wrapperBackground};
+         color: ${colors[selectedColor].wrapperColor};
          padding-top: 100px;
          }
          body {
@@ -177,8 +178,8 @@ function generateHTML(githubUserData, selectedColor) {
          display: flex;
          justify-content: center;
          flex-wrap: wrap;
-         background-color: ${colors[selectedColor.headerBackground]};
-         color: ${colors[selectedColor.headerColor]};
+         background-color: ${colors[selectedColor].headerBackground};
+         color: ${colors[selectedColor].headerColor};
          padding: 10px;
          width: 95%;
          border-radius: 6px;
@@ -189,8 +190,8 @@ function generateHTML(githubUserData, selectedColor) {
          border-radius: 50%;
          object-fit: cover;
          margin-top: -75px;
-         border: 6px solid ${colors[selectedColor.photoBorderColor]};
-         color: ${colors[selectedColor.photoBorderColor]};
+         border: 6px solid ${colors[selectedColor].photoBorderColor};
+         color: ${colors[selectedColor].photoBorderColor};
          box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
          }
          .photo-header h1, .photo-header h2 {
@@ -233,8 +234,8 @@ function generateHTML(githubUserData, selectedColor) {
          .card {
            padding: 20px;
            border-radius: 6px;
-           background-color: ${colors[selectedColor.headerBackground]};
-           color: ${colors[selectedColor.headerColor]};
+           background-color: ${colors[selectedColor].headerBackground};
+           color: ${colors[selectedColor].headerColor};
            margin: 20px;
          }
          
