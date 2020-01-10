@@ -1,7 +1,7 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
-//const electron = require('electron');
-//const convertFactory = require('electron-html-to');
+const electron = require("electron");
+const convertFactory = require("electron-html-to");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
 const readFileAsync = util.promisify(fs.readFile);
@@ -32,7 +32,7 @@ const colors = {
     photoBorderColor: "white"
   }
 };
-function promptUser () {
+function promptUser() {
   return inquirer.prompt([
     {
       type: "input",
@@ -46,12 +46,12 @@ function promptUser () {
       choices: ["green", "blue", "pink", "red"]
     }
   ]);
-};
-promptUser().then(function ({ username, colors }) {
+}
+promptUser().then(function({ username, colors }) {
   const selectedColor = colors;
   //console.log(selectedColor.color);
   const queryUrl = `https://api.github.com/users/${username}`;
-  axios.get(queryUrl).then(function (res) {
+  axios.get(queryUrl).then(function(res) {
     const a = res.data;
     const name = a.name;
     const picture = a.picture_url;
@@ -66,7 +66,7 @@ promptUser().then(function ({ username, colors }) {
     const queryUrlStars = `https://api.github.com/users/${username}/starred`;
     axios
       .get(queryUrlStars)
-      .then(function (stars) {
+      .then(function(stars) {
         const starsLength = stars.data.length;
         const githubUserData = {
           name,
@@ -81,26 +81,29 @@ promptUser().then(function ({ username, colors }) {
           following,
           starsLength
         };
-        console.log(selectedColor)
-        generateHTML(githubUserData, selectedColor);
-        //writeFileAsync("index.html");
+        //console.log(selectedColor)
+        const html = generateHTML(githubUserData, selectedColor);
+        writeFileAsync("index.html", html);
       })
-      .then(() => {
+      .catch(function(err) {
+        //   console.log(err);
+        // .then(() => {
         readFileAsync("index.html", "utf8").then(htmlString => {
-          //const convertFactory = htmlToPdf({
-           // converterPath: htmlToPdf.converters.PDF
-          //});
-          //conversion({ html: htmlString }, function (err, result) {
-          //  if (err) {
-           //   return console.error(err);
-           // }
-           // res.stream.pipe(fs.createWriteStream("Profile.pdf"));
-           // conversion.kill();
-         });
+          const conversion = htmlToPdf({
+            converterPath: htmlToPdf.converters.PDF
+          });
+          conversion({ html: htmlString }, function(err, res) {
+            if (err) {
+              return console.error(err);
+            }
+            res.stream.pipe(fs.createWriteStream("Profile.pdf"));
+            conversion.kill();
+          });
         });
       });
   });
-//});
+});
+
 function generateHTML(githubUserData, selectedColor) {
   return `
 <!DOCTYPE html>
@@ -252,24 +255,25 @@ function generateHTML(githubUserData, selectedColor) {
           } 
          }
       </style>
+      </head>
        <body>
        <div class="wrapper">
-      <div class="photo-header">
+        <div class="photo-header">
         <img class="" src="${githubUserData.picture}" />
         <h1>Hi!</h1>
         <h1>My name is ${githubUserData.name}</h1>
         <div class="links-nav">
-          <a
-            class="nav-link"
-            href="https://www.google.com/maps/place/${githubUserData.location}"
-            ><i class="fas fa-map-marker-alt">${githubUserData.location}</i>
+          <a class="nav-link" href="https://www.google.com/maps/place/${
+            githubUserData.location
+          }"> 
+          <i class="fas fa-map-marker-alt">${githubUserData.location}</i>
           </a>
-          <a class="nav-link" href="${githubUserData.githubLink}"
-            ><i class="fab fa-github"></i> GitHub</a
-          >
-          <a class="nav-link" href="${githubUserData.blogLink}"
-            ><i class="fas fa-rss"></i> Blog</a
-          >
+          <a class="nav-link" href="${
+            githubUserData.githubLink
+          }"><i class="fab fa-github"></i> GitHub</a>
+          <a class="nav-link" href="${
+            githubUserData.blogLink
+          }"><i class="fas fa-rss"></i> Blog</a>
         </div>
       </div>
       <main>
@@ -294,42 +298,11 @@ function generateHTML(githubUserData, selectedColor) {
             <div class="card col col-sm-6">
               <h2>Public Repos</h2>
               <h3>${githubUserData.repos}</h3>
-            </div>
           </div>
           <br />
         </div>
       </main>
     </div>
        </body>
-      </html>
-`;
+      </html>`;
 }
-/*<body>
-  <div class="jumbotron jumbotron-fluid">
-  <div class="container wrapper">
-    <h1 class="display-4">Hi! My name is ${answers.name}</h1>
-    <p class="lead">My favorite color is ${answers.color}.</p>
-    <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
-    <ul class="list-group">
-      <li class="list-group-item">My GitHub username is ${answers.username}</li>
-    </ul>
-  </div>
-</div>
-</body>
-</html>`;
-}
-
-promptUser()
-  .then(function({ username }) {
-    const queryUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
-  })
-  .then(function(answers) {
-    const html = generateHTML(answers);
-    return writeFileAsync("index.html", html);
-  })
-  .then(function() {
-    console.log("Successfully wrote to index.html");
-  })
-  .catch(function(err) {
-    console.log(err);
-  }); */
