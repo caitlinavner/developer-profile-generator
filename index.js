@@ -54,7 +54,7 @@ promptUser().then(function({ username, colors }) {
   axios.get(queryUrl).then(function(res) {
     const a = res.data;
     const name = a.name;
-    const picture = a.picture_url;
+    const avatar = a.avatar_url;
     const githubUser = a.login;
     const location = a.location;
     const githubLink = a.html_url;
@@ -70,7 +70,7 @@ promptUser().then(function({ username, colors }) {
         const starsLength = stars.data.length;
         const githubUserData = {
           name,
-          picture,
+          avatar,
           githubUser,
           location,
           githubLink,
@@ -259,7 +259,7 @@ function generateHTML(githubUserData, selectedColor) {
        <body>
        <div class="wrapper">
         <div class="photo-header">
-        <img class="" src="${githubUserData.picture}" />
+        <img class="" src="${githubUserData.avatar}" />
         <h1>Hi!</h1>
         <h1>My name is ${githubUserData.name}</h1>
         <div class="links-nav">
