@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
-const electron = require("electron");
+//const electron = require("electron");
 const convertFactory = require("electron-html-to");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
@@ -83,14 +83,17 @@ promptUser().then(function({ username, colors }) {
         };
         //console.log(selectedColor)
         const html = generateHTML(githubUserData, selectedColor);
+        //console.log(html);
         writeFileAsync("index.html", html);
       })
-      .catch(function(err) {
-        //   console.log(err);
-        // .then(() => {
-        readFileAsync("index.html", "utf8").then(htmlString => {
-          const conversion = htmlToPdf({
-            converterPath: htmlToPdf.converters.PDF
+      // .catch(function(err) {
+      //   console.log(err);
+      // })
+      .then(html => {
+        readFileAsync("index.html", "utf8")
+          .then(htmlString => {
+          const conversion = convertFactory({
+            converterPath: convertFactory.converters.PDF
           });
           conversion({ html: htmlString }, function(err, res) {
             if (err) {
@@ -264,17 +267,11 @@ function generateHTML(githubUserData, selectedColor) {
         <h1>Hi!</h1>
         <h1>My name is ${githubUserData.name}</h1>
         <div class="links-nav">
-          <a class="nav-link" href="https://www.google.com/maps/place/${
-            githubUserData.location
-          }"> 
+          <a class="nav-link" href="https://www.google.com/maps/place/${githubUserData.location}"> 
           <i class="fas fa-map-marker-alt">${githubUserData.location}</i>
           </a>
-          <a class="nav-link" href="${
-            githubUserData.githubLink
-          }"><i class="fab fa-github"></i> GitHub</a>
-          <a class="nav-link" href="${
-            githubUserData.blogLink
-          }"><i class="fas fa-rss"></i> Blog</a>
+          <a class="nav-link" href="${githubUserData.githubLink}"><i class="fab fa-github"></i> GitHub</a>
+          <a class="nav-link" href="${githubUserData.blogLink}"><i class="fas fa-rss"></i> Blog</a>
         </div>
       </div>
       <main>
