@@ -18,3 +18,5 @@ Number of users following
 
 Problems encountered:
 I was able to generate a PDF using this node app. However, the pdf doesn't display the correct information. Although, an html page does generate and displays all of the required info.
+Update!!
+PDF now generates and displays all required info.
